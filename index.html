@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remote Movie Collaboration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #meet, #moviePlayer {
+            margin: 20px 0;
+        }
+        #commentSection {
+            margin-top: 10px;
+        }
+        #comments {
+            height: 150px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+        #emojiReactions {
+            margin-top: 10px;
+        }
+        .emoji {
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Remote Movie Collaboration</h1>
+
+    <!-- Movie Player -->
+    <h2>Movie Player</h2>
+    <video id="moviePlayer" width="800" height="450" controls>
+        <source src="your_movie.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <!-- Jitsi Meet Embed -->
+    <h2>Live Discussion</h2>
+    <div id="meet" style="width: 800px; height: 640px;"></div>
+
+    <!-- Comment Section -->
+    <h2>Comments</h2>
+    <div id="commentSection">
+        <div id="comments"></div>
+        <input type="text" id="commentInput" placeholder="Add your comment" style="width: 600px;">
+        <button onclick="addComment()">Send</button>
+    </div>
+
+    <!-- Emoji Reactions -->
+    <h2>Emoji Reactions</h2>
+    <div id="emojiReactions">
+        <span class="emoji" onclick="sendEmoji('❤️')">❤️</span>
+        <span class="emoji" onclick="sendEmoji('😂')">😂</span>
+        <span class="emoji" onclick="sendEmoji('👍')">👍</span>
+        <span class="emoji" onclick="sendEmoji('😲')">😲</span>
+    </div>
+
+    <script>
+        // Jitsi Meet Embedding
+        navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(function(stream) { console.log('You let me use your mic!') })
+        .catch(function(err) { console.log('No mic for you!') });
+
+        const domain = 'meet.jit.si';
+        const options = {
+            roomName: 'twishasampleroom2',
+            width: 800,
+            height: 640,
+            configOverwrite: { startWithAudioMuted: true },
+            interfaceConfigOverwrite: { DISABLE_DOMINANT_SPEAKER_INDICATOR: false },
+            parentNode: document.querySelector('#meet')
+        };
+        const api = new JitsiMeetExternalAPI(domain, options);
+
+        // Comment Section
+        function addComment() {
+            const comment = document.getElementById('commentInput').value;
+            const commentsDiv = document.getElementById('comments');
+            const newComment = document.createElement('div');
+            const timestamp = new Date().toLocaleTimeString();
+            newComment.textContent = `${timestamp} - ${comment}`;
+            commentsDiv.appendChild(newComment);
+            commentsDiv.scrollTop = commentsDiv.scrollHeight; // Auto-scroll to the bottom
+            document.getElementById('commentInput').value = ''; // Clear input
+        }
+
+        // Emoji Reactions
+        function sendEmoji(emoji) {
+            const commentsDiv = document.getElementById('comments');
+            const newEmoji = document.createElement('div');
+            const timestamp = new Date().toLocaleTimeString();
+            newEmoji.textContent = `${timestamp} - ${emoji}`;
+            commentsDiv.appendChild(newEmoji);
+            commentsDiv.scrollTop = commentsDiv.scrollHeight; // Auto-scroll to the bottom
+        }
+
+        // Movie Sync Mechanism (Placeholder - basic syncing can be enhanced with time server)
+        const videoPlayer = document.getElementById('moviePlayer');
+        let startTime = Date.now();
+
+        videoPlayer.addEventListener('play', function() {
+            console.log('Movie started at:', startTime);
+        });
+
+        videoPlayer.addEventListener('pause', function() {
+            console.log('Movie paused at:', videoPlayer.currentTime);
+        });
+
+        videoPlayer.addEventListener('seeked', function() {
+            console.log('Movie skipped to:', videoPlayer.currentTime);
+        });
+    </script>
+
+</body>
+</html>
+
