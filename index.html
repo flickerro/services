@@ -5,104 +5,264 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Remote Movie Collaboration</title>
     <style>
-        body {
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
             font-family: Arial, sans-serif;
         }
-        #meet, #moviePlayer {
-            margin: 20px 0;
+        #mainContainer {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
         }
-        #commentSection {
-            margin-top: 10px;
+        video {
+            width: 100%;
+            height: auto;
+            max-height: 100vh;
         }
-        #comments {
-            height: 150px;
-            overflow-y: auto;
+        #controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 100;
+        }
+        #controls button {
+            font-size: 20px;
+            margin: 5px;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        #logo {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+        }
+        #jitsiOverlay, #commentsOverlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 30%;
+            height: 50%;
+            z-index: 10;
+            background: white;
             border: 1px solid #ccc;
+            overflow: hidden;
+        }
+        #commentsOverlay {
+            bottom: 0;
+            right: 0;
+            width: 30%;
+            height: 30%;
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+        #commentsOverlay #comments {
+            height: 80%;
+            overflow-y: auto;
+            border: none;
             padding: 10px;
         }
-        #emojiReactions {
-            margin-top: 10px;
-        }
-        .emoji {
-            font-size: 24px;
-            cursor: pointer;
+        #commentInput {
+            width: 70%;
             padding: 5px;
+        }
+        #emojiPicker {
+            width: 20%;
+            cursor: pointer;
+        }
+        #syncPopup, #schedulePopup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 100;
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+        }
+        #syncPopup input, #schedulePopup input {
+            margin: 10px 0;
+            padding: 10px;
+            width: 100%;
+        }
+        #timeSlider {
+            width: 100%;
+        }
+        @media (max-width: 768px) {
+            video {
+                height: 100%;
+            }
+            #jitsiOverlay, #commentsOverlay {
+                width: 100%;
+                height: 50%;
+            }
         }
     </style>
 </head>
 <body>
 
-    <h1>Remote Movie Collaboration</h1>
+<div id="mainContainer">
+    <!-- Flickerro Logo -->
+    <div id="logo" onclick="window.location.href='https://flickerro.github.io'">Flickerro</div>
 
-    <!-- Movie Player -->
-    <h2>Movie Player</h2>
-    <video id="moviePlayer" width="800" height="450" controls>
-        <source src="https://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4" type="video/mp4">
+    <!-- Video Player -->
+    <video id="moviePlayer" controls>
+        <source id="videoSource" src="https://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4" type="video/mp4">
         Your browser does not support the video tag.
     </video>
 
-    <!-- Emoji Reactions -->
-    <h2>Emoji Reactions</h2>
-    <div id="emojiReactions">
-        <span class="emoji" onclick="sendEmoji('❤️')">❤️</span>
-        <span class="emoji" onclick="sendEmoji('😂')">😂</span>
-        <span class="emoji" onclick="sendEmoji('👍')">👍</span>
-        <span class="emoji" onclick="sendEmoji('😲')">😲</span>
+    <!-- Control Icons to Toggle Jitsi, Comments, Sync, and Schedule -->
+    <div id="controls">
+        <button onclick="toggleJitsi()">💬</button> <!-- Toggle Jitsi -->
+        <button onclick="toggleComments()">📝</button> <!-- Toggle Comments -->
+        <button onclick="openSyncPopup()">🔄</button> <!-- Sync Popup -->
+        <button onclick="openSchedulePopup()">📅</button> <!-- Schedule Popup -->
     </div>
 
-    
-    <!-- Jitsi Meet Embed -->
-    <h2>Live Discussion</h2>
-    <script> navigator.mediaDevices.getUserMedia({ audio: true }) .then(function(stream) { console.log('You let me use your mic!') }) .catch(function(err) { console.log('No mic for you!') }); </script> <script src='https://meet.jit.si/external_api.js'></script> <script> const domain = 'meet.jit.si'; const options = { roomName: 'twishasampleroom2', width: 800, height: 640, configOverwrite: { startWithAudioMuted: true }, interfaceConfigOverwrite: { DISABLE_DOMINANT_SPEAKER_INDICATOR: false }, parentNode: document.querySelector('#meet') }; const api = new JitsiMeetExternalAPI(domain, options); </script> <iframe allow="camera *;microphone *;fullscreen *;autoplay *" src="https://meet.jit.si/Flickerroa975c295ddeab5b1a5323df92f61c4cc9fc88207" width="800" height="640" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+    <!-- Jitsi Meet Overlay -->
+    <div id="jitsiOverlay">
+        <iframe allow="camera *;microphone *;fullscreen *;autoplay *"
+                src="https://meet.jit.si/Flickerroa975c295ddeab5b1a5323df92f61c4cc9fc88207"
+                width="100%" height="100%" frameborder="0" marginheight="0" marginwidth="0">
+            Loading…
+        </iframe>
+    </div>
 
-    <!-- Comment Section -->
-    <h2>Comments</h2>
-    <div id="commentSection">
+    <!-- Comments Overlay -->
+    <div id="commentsOverlay">
         <div id="comments"></div>
-        <input type="text" id="commentInput" placeholder="Add your comment" style="width: 600px;">
+        <input type="text" id="commentInput" placeholder="Add your comment">
+        <select id="emojiPicker" onchange="addEmoji()">
+            <option value="">😊</option>
+            <option value="😊">😊</option>
+            <option value="😂">😂</option>
+            <option value="👍">👍</option>
+            <option value="❤️">❤️</option>
+            <option value="🔥">🔥</option>
+        </select>
         <button onclick="addComment()">Send</button>
     </div>
 
-    <script>
-        // Comment Section
-        function addComment() {
-            const comment = document.getElementById('commentInput').value;
-            const commentsDiv = document.getElementById('comments');
-            const newComment = document.createElement('div');
-            const timestamp = new Date().toLocaleTimeString();
-            newComment.textContent = `${timestamp} - ${comment}`;
-            commentsDiv.appendChild(newComment);
-            commentsDiv.scrollTop = commentsDiv.scrollHeight; // Auto-scroll to the bottom
-            document.getElementById('commentInput').value = ''; // Clear input
+    <!-- Sync Popup -->
+    <div id="syncPopup">
+        <h3>Sync Video</h3>
+        <input type="range" id="timeSlider" min="0" max="100" step="1" value="0" oninput="seekToPosition()">
+        <button onclick="closeSyncPopup()">Close</button>
+    </div>
+
+    <!-- Schedule Popup -->
+    <div id="schedulePopup">
+        <h3>Schedule Viewing</h3>
+        <label for="movieSelect">Select Movie:</label>
+        <select id="movieSelect">
+            <option value="Big Buck Bunny">Big Buck Bunny</option>
+            <option value="Sintel">Sintel</option>
+            <option value="Tears of Steel">Tears of Steel</option>
+        </select>
+        <br>
+        <label for="datePicker">Select Date:</label>
+        <input type="date" id="datePicker">
+        <label for="timePicker">Select Time:</label>
+        <input type="time" id="timePicker">
+        <button onclick="scheduleViewing()">Schedule</button>
+        <button onclick="closeSchedulePopup()">Close</button>
+    </div>
+</div>
+
+<script>
+    // Toggle Jitsi Overlay
+    function toggleJitsi() {
+        const jitsiOverlay = document.getElementById('jitsiOverlay');
+        jitsiOverlay.style.display = jitsiOverlay.style.display === 'block' ? 'none' : 'block';
+    }
+
+    // Toggle Comments Overlay
+    function toggleComments() {
+        const commentsOverlay = document.getElementById('commentsOverlay');
+        commentsOverlay.style.display = commentsOverlay.style.display === 'block' ? 'none' : 'block';
+    }
+
+    // Sync Popup
+    function openSyncPopup() {
+        document.getElementById('syncPopup').style.display = 'block';
+    }
+
+    function closeSyncPopup() {
+        document.getElementById('syncPopup').style.display = 'none';
+    }
+
+    // Schedule Popup
+    function openSchedulePopup() {
+        document.getElementById('schedulePopup').style.display = 'block';
+    }
+
+    function closeSchedulePopup() {
+        document.getElementById('schedulePopup').style.display = 'none';
+    }
+
+    // Schedule Viewing (movie selection and date/time)
+    function scheduleViewing() {
+        const movie = document.getElementById('movieSelect').value;
+        const date = document.getElementById('datePicker').value;
+        const time = document.getElementById('timePicker').value;
+        alert(`Viewing scheduled for: ${movie} on ${date} at ${time}`);
+        closeSchedulePopup();
+    }
+
+    // Add Comment with Emoji
+    function addComment() {
+        const comment = document.getElementById('commentInput').value;
+        const emoji = document.getElementById('emojiPicker').value;
+        const commentsDiv = document.getElementById('comments');
+        const newComment = document.createElement('div');
+        const timestamp = new Date().toLocaleTimeString();
+        newComment.textContent = `${timestamp} - ${comment} ${emoji}`;
+        commentsDiv.appendChild(newComment);
+        commentsDiv.scrollTop = commentsDiv.scrollHeight;
+        document.getElementById('commentInput').value = '';
+        document.getElementById('emojiPicker').value = '';
+    }
+
+    // Add Emoji to Comment Input
+    function addEmoji() {
+        const emoji = document.getElementById('emojiPicker').value;
+        const commentInput = document.getElementById('commentInput');
+        commentInput.value += emoji;
+    }
+
+    // Fullscreen video when orientation changes
+    window.addEventListener("orientationchange", function() {
+        const video = document.getElementById('moviePlayer');
+        if (window.innerHeight > window.innerWidth) {
+            video.style.width = "100%";
+            video.style.height = "auto";
+        } else {
+            video.style.height = "100%";
+            video.style.width = "auto";
         }
+    });
 
-        // Emoji Reactions
-        function sendEmoji(emoji) {
-            const commentsDiv = document.getElementById('comments');
-            const newEmoji = document.createElement('div');
-            const timestamp = new Date().toLocaleTimeString();
-            newEmoji.textContent = `${timestamp} - ${emoji}`;
-            commentsDiv.appendChild(newEmoji);
-            commentsDiv.scrollTop = commentsDiv.scrollHeight; // Auto-scroll to the bottom
-        }
-
-        // Movie Sync Mechanism (Placeholder - basic syncing can be enhanced with time server)
-        const videoPlayer = document.getElementById('moviePlayer');
-        let startTime = Date.now();
-
-        videoPlayer.addEventListener('play', function() {
-            console.log('Movie started at:', startTime);
-        });
-
-        videoPlayer.addEventListener('pause', function() {
-            console.log('Movie paused at:', videoPlayer.currentTime);
-        });
-
-        videoPlayer.addEventListener('seeked', function() {
-            console.log('Movie skipped to:', videoPlayer.currentTime);
-        });
-    </script>
+    // Seek to position based on slider
+    function seekToPosition() {
+        const video = document.getElementById('moviePlayer');
+        const slider = document.getElementById('timeSlider');
+        const time = video.duration * (slider.value / 100);
+        video.currentTime = time;
+    }
+</script>
 
 </body>
 </html>
-
