@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login as Host or Guest</title>
+    <style>
+        /* Global Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body, html {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e9ecef; /* Light grey background */
+            height: 100%;
+            width: 100%;
+            display: flex;
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
+            padding: 20px; /* Add some padding */
+        }
+
+        /* Container */
+        #loginContainer {
+            background-color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            width: 100%; /* Full width for smaller screens */
+            max-width: 400px; /* Maximum width for larger screens */
+            text-align: center; /* Center text in container */
+        }
+
+        /* Header */
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 1.8rem;
+        }
+
+        /* Radio Button Styles */
+        .radio-label {
+            display: flex;
+            align-items: center;
+            justify-content: center; /* Center the radio button and text */
+            margin: 10px 0; /* Space between options */
+            cursor: pointer; /* Pointer on hover */
+        }
+        input[type="radio"] {
+            margin-right: 10px; /* Space between radio button and label */
+        }
+
+        /* Button */
+        button {
+            padding: 12px;
+            background-color: #28a745; /* Green button */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%; /* Full width button */
+        }
+
+        button.active {
+            background-color: #007bff; /* Blue when selected */
+        }
+
+        button:hover {
+            background-color: #218838; /* Darker green on hover */
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            h2 {
+                font-size: 1.5rem; /* Adjust header size */
+            }
+            button {
+                padding: 10px; /* Adjust button padding */
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div id="loginContainer">
+    <h2>Select Role</h2>
+
+    <!-- Role Selection -->
+    <div class="radio-label">
+        <input type="radio" name="role" id="hostRadio" onclick="updateButton(this, 'Host')">
+        <label for="hostRadio">Host</label>
+    </div>
+    <div class="radio-label">
+        <input type="radio" name="role" id="guestRadio" onclick="updateButton(this, 'Guest')">
+        <label for="guestRadio">Guest</label>
+    </div>
+
+    <!-- Login Button -->
+    <button id="loginButton" onclick="login()">Login</button>
+</div>
+
+<script>
+    function updateButton(radio, role) {
+        const loginButton = document.getElementById('loginButton');
+
+        // Update button text and style
+        loginButton.textContent = `Login as ${role}`;
+        loginButton.className = 'active'; // Highlight the button
+    }
+
+    function login() {
+        const loginButton = document.getElementById('loginButton').textContent;
+        alert(`You clicked: ${loginButton}`);
+        // Add your login logic here
+    }
+</script>
+
+</body>
+</html>

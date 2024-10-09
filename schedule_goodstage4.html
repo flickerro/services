@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule Movie Viewing</title>
+    <style>
+        /* Global Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body, html {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e9ecef; /* Light grey background */
+            height: 100%;
+            width: 100%;
+            display: flex;
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
+            padding: 10px;
+        }
+
+        /* Container */
+        #scheduleContainer {
+            width: 60%; /* 60% of the page width */
+            height: 100%; /* 100% of the page height */
+            background-color: #ffffff; /* White background */
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column; /* Column layout */
+            gap: 10px; /* Space between items */
+            overflow-y: auto; /* Allow scrolling if necessary */
+        }
+
+        /* Header */
+        h2 {
+            text-align: center;
+            color: #007bff; /* Blue color for the header */
+            margin-bottom: 20px; /* Adjusted margin for better visibility */
+            font-size: 1.8rem;
+        }
+
+        /* Form Labels */
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333; /* Dark grey for labels */
+        }
+
+        /* Inputs and Selects */
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #007bff; /* Blue border */
+            border-radius: 8px;
+            font-size: 1rem;
+            background-color: #f8f9fa; /* Light background for inputs */
+            transition: all 0.3s ease;
+        }
+        input:focus, select:focus {
+            border-color: #0056b3; /* Darker blue on focus */
+            outline: none;
+            background-color: #ffffff; /* White background on focus */
+            box-shadow: 0 0 8px rgba(0, 86, 179, 0.3); /* Blue shadow on focus */
+        }
+
+        /* Button */
+        button {
+            padding: 12px;
+            background-color: #28a745; /* Green button */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background-color: #218838; /* Darker green on hover */
+        }
+
+        /* Grid Layout */
+        .form-group {
+            display: flex;
+            justify-content: space-between; /* Space elements evenly */
+            gap: 10px; /* Space between inputs */
+            width: 100%; /* Ensure full width */
+        }
+        .form-group > div {
+            flex: 1; /* Equal flex-grow for children */
+            margin-right: 10px; /* Space between columns */
+        }
+        .form-group > div:last-child {
+            margin-right: 0; /* No margin on the last item */
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            #scheduleContainer {
+                padding: 15px;
+                height: auto; /* Allow height to adjust */
+            }
+            h2 {
+                font-size: 1.5rem;
+            }
+            .form-group {
+                flex-direction: column; /* Stack vertically on small screens */
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div id="scheduleContainer">
+    <h2>Schedule Movie Viewing</h2>
+
+    <!-- Form Elements -->
+    <div class="form-group">
+        <!-- Movie Selection -->
+        <div>
+            <label for="movieSelect">Select Movie:</label>
+            <select id="movieSelect">
+                <option value="Big Buck Bunny">Big Buck Bunny</option>
+                <option value="Sintel">Sintel</option>
+                <option value="Tears of Steel">Tears of Steel</option>
+            </select>
+        </div>
+        
+        <!-- Date Selection -->
+        <div>
+            <label for="datePicker">Select Date:</label>
+            <input type="date" id="datePicker">
+        </div>
+
+        <!-- Time Selection -->
+        <div>
+            <label for="timePicker">Select Time:</label>
+            <input type="time" id="timePicker">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <!-- Email Field for additional emails -->
+        <div>
+            <label for="emailInput">Enter Email Address (optional):</label>
+            <input type="email" id="emailInput" placeholder="example@example.com">
+        </div>
+
+        <!-- Group Selection Multiple Dropdown -->
+        <div>
+            <label for="groupSelect">Select Groups:</label>
+            <select id="groupSelect" multiple>
+                <option value="Group 1">Group 1</option>
+                <option value="Group 2">Group 2</option>
+                <option value="Group 3">Group 3</option>
+                <option value="Group 4">Group 4</option>
+                <option value="Group 5">Group 5</option>
+            </select>
+        </div>
+
+        <!-- Additional Email IDs -->
+        <div>
+            <label for="additionalEmails">Add Additional Email IDs:</label>
+            <input type="text" id="additionalEmails" placeholder="example1@example.com, example2@example.com">
+        </div>
+    </div>
+
+    <!-- Schedule Button -->
+    <button onclick="scheduleViewing()">Schedule Viewing</button>
+</div>
+
+<script>
+    function scheduleViewing() {
+        const movie = document.getElementById('movieSelect').value;
+        const date = document.getElementById('datePicker').value;
+        const time = document.getElementById('timePicker').value;
+        const email = document.getElementById('emailInput').value;
+
+        // Get selected groups
+        const groupSelect = document.getElementById('groupSelect');
+        const selectedGroups = Array.from(groupSelect.selectedOptions).map(option => option.value);
+
+        // Get additional email addresses
+        const additionalEmails = document.getElementById('additionalEmails').value;
+        const allEmails = email ? [email, ...additionalEmails.split(',').map(e => e.trim())] : additionalEmails.split(',').map(e => e.trim());
+
+        // Construct alert message
+        let message = `Viewing scheduled for: ${movie} on ${date} at ${time}.`;
+        if (allEmails.length > 0 && allEmails[0] !== "") {
+            message += ` Email(s): ${allEmails.join(", ")}.`;
+        }
+        if (selectedGroups.length > 0) {
+            message += ` Groups: ${selectedGroups.join(", ")}.`;
+        }
+
+        alert(message);
+    }
+</script>
+
+</body>
+</html>

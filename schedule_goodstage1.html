@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule Movie Viewing</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+        }
+        #scheduleContainer {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        select[multiple] {
+            height: auto;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+
+<div id="scheduleContainer">
+    <h2>Schedule Movie Viewing</h2>
+
+    <!-- Movie Selection -->
+    <label for="movieSelect">Select Movie:</label>
+    <select id="movieSelect">
+        <option value="Big Buck Bunny">Big Buck Bunny</option>
+        <option value="Sintel">Sintel</option>
+        <option value="Tears of Steel">Tears of Steel</option>
+    </select>
+
+    <!-- Date Selection -->
+    <label for="datePicker">Select Date:</label>
+    <input type="date" id="datePicker">
+
+    <!-- Time Selection -->
+    <label for="timePicker">Select Time:</label>
+    <input type="time" id="timePicker">
+
+    <!-- Email Field -->
+    <label for="emailInput">Enter Email Address (optional):</label>
+    <input type="email" id="emailInput" placeholder="example@example.com">
+
+    <!-- Group Selection Multiple Dropdown -->
+    <label for="groupSelect">Select Groups:</label>
+    <select id="groupSelect" multiple>
+        <option value="Group 1">Group 1</option>
+        <option value="Group 2">Group 2</option>
+        <option value="Group 3">Group 3</option>
+        <option value="Group 4">Group 4</option>
+        <option value="Group 5">Group 5</option>
+    </select>
+
+    <!-- Schedule Button -->
+    <button onclick="scheduleViewing()">Schedule Viewing</button>
+</div>
+
+<script>
+    function scheduleViewing() {
+        const movie = document.getElementById('movieSelect').value;
+        const date = document.getElementById('datePicker').value;
+        const time = document.getElementById('timePicker').value;
+        const email = document.getElementById('emailInput').value;
+
+        // Get selected groups
+        const groupSelect = document.getElementById('groupSelect');
+        const selectedGroups = Array.from(groupSelect.selectedOptions).map(option => option.value);
+
+        // Construct alert message
+        let message = `Viewing scheduled for: ${movie} on ${date} at ${time}.`;
+        if (email) {
+            message += ` Email: ${email}.`;
+        }
+        if (selectedGroups.length > 0) {
+            message += ` Groups: ${selectedGroups.join(", ")}.`;
+        }
+
+        alert(message);
+    }
+</script>
+
+</body>
+</html>
