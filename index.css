@@ -1,0 +1,59 @@
+/*logo {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+    height: 50%;
+    margin-bottom: 3%;
+    /*border: 1px;
+    border-color: aqua;
+    border-style: solid;
+  }*/
+  .item {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .division {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+    margin-bottom: 3%;
+    /*border: 1px;
+    border-color: aqua;
+    border-style: solid;*/
+  }
+  .divisionLogin {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    align-content: center;
+    width: 50%;
+    margin-top: 10px;
+    /*border: 1px;
+    border-color: aqua;
+    border-style: solid;*/
+  }
+  #button {
+    padding: 15px 25px;
+    font-size: 24px;
+    text-align: center;
+    cursor: pointer;
+    outline: none;
+    color: #fff;
+    background-color: #ff0000;
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 9px #999;
+  }
+  
+  #button:hover {background-color: #ff0000}
+  
+  #button:active {
+    background-color: #3e8e41;
+    box-shadow: 0 5px #666;
+    transform: translateY(4px);
+  }
+
+ 

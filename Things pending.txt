@@ -1,0 +1,50 @@
+Things pending:
+UI
+1)When we Login as a Guest or Admin(may be these names should be changed "Login as") we see a Calender page as shown in Guest Page.
+--> When we hover on it, it showing the movies scheduled.(This is already implemented)
+--> We should be able to double click on that and it should open a pop up, like how we see in Outlook.(But the content in that would be different). 
+    This is called View/Edit Screen.
+View/Edit: if you login as Guest, it will show the info of the scheduled movies, if we login as Host, it will show the same page with edit button beside it.
+If we click on Edit it should redirect him to the Edit Page of Admin.(Admin.html description for this is given below.)
+2)Use the other part of the page in schedule.html, to create groups.
+3)Admin.html: Create an access page, where there will be list of users and there will be list of groups and we can select the options such as
+--> Give access to 1)Voice 2)Audio 3) Video 4)Make him as Admin
+4)If multiple people are admins, they should be able to alter other peoples data 
+ Data includes
+-->Dismiss another admin,
+-->Remove admin from the scheduled group or movie slot.
+-->Remove other people from the group.
+-->Change access for audio,video,text or other people.
+-->Make the Jitsy to connect automatically when all the people join the meeting and only display for one user/admin to be visible in the screen on the top right, we only show one user at a time.
+ if someone other than you is doing the talking.
+if multiple people are doing the talking show video only of one user at a time and let jitsy handle it.
+--> suggest an option for audio to be enabled for all the users.
+The above video should be enabled for the specific groups 
+But audio can be made available to either everyone or only to its group and this can be configured by admin.
+Website theme could be changed to REd color: as Cinema takes Red.
+
+Data Modelling:
+5) The data that we currently have is users data, groups data, movie groups and schedule data
+6)Create data modeling and try to come up with the data model.
+Make sure you are using graph's for users connectivity, would be a undirected, unweighted graph(subjected to change) and we have some light weight database or any which is specific to graphs and also think of an alternate way if needed to store the other data in a different database we feel storing data apart from the user data in a different database is a good option.
+Make sure all the partitioning and other things are handled(CAP theorem). use a single or multiple databases to handle these things efficiently.
+Make sure you are taking cost effectiveness also into consideration. also see for databases if the framework itself is handling the scaling part or we have to do it manually.( try to show the loading icon and do these database operations while you show message "Schedule Meeting"
+7)Build serverless Azure functions as a middle ware to make it loosely coupled and for cost effectiveness.
+
+
+Authentication and Authorization: 
+8)Sync the emails that we are adding and the groups data to Azure AD and maintain sync with our database. Also see if just the email data could be synced and other data is not needed and use OAUTH 2.0 and OpenID connect using App Registerations(OAuth 2.0 for client authentication and OpenID connect to connect to Azure App Services and Databases)
+9)Make this into Angular application as there is no redirects that are done for every page and the client code is completely at local for front end and for effective Oauth implementation as we have libraries handling them.
+10)Multi lingual support using Angular.
+11)Make it secure from DDOS attacks.
+12)Configure Vnet and see if any firewall rules needs to be implemented.
+13)Configure CDN for static content(Caching) and also use CDN for Azure function response caching based on the input content(We can use .net output caching or any other caching given out of box in .net)
+14)Configure load balancers for scaling up the Azure Functions and try to see if we have the option for that scaling incase of databases(see for databases if the framework itself is handling that or we have to do it manually.
+15)test it on different types of devices.
+
+Designed a Logo already 
+I will upload my file with the logo, which can be modified.
+Name of the app: Movie Bond 001. Caption: Experience cinema together.
+ Movie BOND(like how we say James Bond007) Movie Bond 001(001 being the version)
+We can play some music at the back ground when the user open our web page(Music says... Bond... Movie Bond, Experience Cinema Together), i know this is cheesy stuff, but as it is for movie viewing thought it. If we think that it can irritate the user we can remove it or we can keep a mute button selected by default and if the user logs in wants to listen the message he will enable it. we can analyse the stats of people trying to unmute data and see in future to change this option as necessary. 
+ther through the cinema, through the screen so two people on either sides of the screen and through screen they see each other).In designing the logo, have uswede some creativity, interacting with each o
