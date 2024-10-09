@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Schedule Calendar</title>
+    <style>
+        /* Global Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body, html {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #e9ecef;
+            height: 100%;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Calendar Container */
+        #calendarContainer {
+            background-color: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            width: 90%; /* Responsive width */
+            max-width: 600px; /* Max width for larger screens */
+            text-align: center;
+            position: relative; /* For positioning the tooltip */
+        }
+
+        /* Header */
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 1.8rem;
+        }
+
+        /* Navigation */
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+
+        /* Days of the week */
+        .day {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        .day div {
+            padding: 10px;
+            border-radius: 8px;
+            background-color: #f0f4f8;
+            transition: background-color 0.3s;
+            position: relative; /* For positioning the tooltip */
+            overflow: hidden; /* Prevent overflow */
+            text-overflow: ellipsis; /* Ellipsis for overflowing text */
+            white-space: nowrap; /* Prevent text wrapping */
+        }
+        .day div:hover {
+            background-color: #d1e7dd; /* Light green hover effect */
+        }
+
+        /* Highlighted Days */
+        .scheduled {
+            background-color: #ffc107; /* Yellow for scheduled movies */
+            font-weight: bold;
+        }
+
+        /* Tooltip for movie titles */
+        #movieTooltip {
+            position: fixed;
+            background-color: #333;
+            color: #fff;
+            border-radius: 5px;
+            padding: 10px;
+            display: none; /* Initially hidden */
+            z-index: 20; /* Ensure it appears above the calendar */
+            white-space: nowrap;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .day {
+                grid-template-columns: repeat(4, 1fr); /* Fewer columns on small screens */
+            }
+            h2 {
+                font-size: 1.5rem; /* Adjust header size */
+            }
+            button {
+                padding: 8px 12px; /* Adjust button padding */
+            }
+        }
+
+        @media (max-width: 400px) {
+            .day {
+                grid-template-columns: repeat(3, 1fr); /* Even fewer columns on extra small screens */
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div id="calendarContainer">
+    <h2>Movie Schedule Calendar</h2>
+
+    <div class="navigation">
+        <button onclick="changeMonth(-1)">&#8249; Prev</button>
+        <span id="currentMonth"></span>
+        <button onclick="changeMonth(1)">Next &#8250;</button>
+    </div>
+
+    <div class="day" id="calendarDays"></div>
+
+    <!-- Tooltip for displaying movie names on hover -->
+    <div id="movieTooltip"></div>
+</div>
+
+<script>
+    const scheduledMovies = {
+        // Example scheduled movies
+        '2024-10-10': 'Big Buck Bunny',
+        '2024-10-12': 'Sintel',
+        '2024-10-15': 'Tears of Steel',
+        '2024-10-18': 'A Very Long Movie Title That Should Be Truncated',
+        '2024-10-25': 'Another Movie Title'
+    }; // Object to store scheduled movies
+
+    let currentDate = new Date();
+
+    function renderCalendar() {
+        const monthDays = document.getElementById('calendarDays');
+        const movieTooltip = document.getElementById('movieTooltip');
+        monthDays.innerHTML = ''; // Clear previous days
+        movieTooltip.style.display = 'none'; // Hide tooltip initially
+
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        const totalDays = lastDay.getDate();
+
+        document.getElementById('currentMonth').innerText = `${firstDay.toLocaleString('default', { month: 'long' })} ${year}`;
+
+        // Create empty slots for previous month's days
+        for (let i = 0; i < firstDay.getDay(); i++) {
+            const emptyDiv = document.createElement('div');
+            monthDays.appendChild(emptyDiv);
+        }
+
+        // Generate days of the current month
+        for (let i = 1; i <= totalDays; i++) {
+            const dayDiv = document.createElement('div');
+            const currentDay = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+            dayDiv.innerText = i;
+
+            // Highlight scheduled movie days and show the movie title
+            if (scheduledMovies[currentDay]) {
+                dayDiv.classList.add('scheduled');
+                const movieTitle = scheduledMovies[currentDay];
+
+                // Show tooltip on hover
+                dayDiv.onmouseover = (event) => {
+                    movieTooltip.innerText = movieTitle; // Set tooltip text
+                    movieTooltip.style.display = 'block'; // Show tooltip
+                    const rect = event.target.getBoundingClientRect(); // Get position of the dayDiv
+
+                    // Position tooltip above the cursor
+                    movieTooltip.style.left = `${rect.left + window.scrollX}px`; // Align with the left of the dayDiv
+                    movieTooltip.style.top = `${rect.top + window.scrollY - movieTooltip.offsetHeight - 5}px`; // Position above the dayDiv
+                };
+
+                dayDiv.onmouseout = () => {
+                    movieTooltip.style.display = 'none'; // Hide tooltip
+                };
+            }
+
+            monthDays.appendChild(dayDiv);
+        }
+    }
+
+    function changeMonth(direction) {
+        currentDate.setMonth(currentDate.getMonth() + direction);
+        renderCalendar();
+    }
+
+    // Initial render
+    renderCalendar();
+</script>
+
+</body>
+</html>

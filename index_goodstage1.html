@@ -3,28 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Remote Movie Collaboration with Full-Screen Video</title>
+    <title>Remote Movie Collaboration with Caching</title>
     <style>
         body, html {
             margin: 0;
             padding: 0;
             height: 100%;
-            width: 100%;
             font-family: Arial, sans-serif;
-            overflow: hidden; /* Prevent scrolling */
         }
         #mainContainer {
             position: relative;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
             height: 100%;
-            width: 100%;
         }
         video {
-            width: 100vw;
-            height: 100vh;
-            object-fit: cover; /* Ensures the video fills the screen without distortion */
+            width: 100%;
+            height: auto;
+            max-height: 100vh;
         }
         #controls {
             position: absolute;
@@ -48,9 +45,8 @@
             left: 10px;
             font-size: 24px;
             font-weight: bold;
-            color: white;
+            color: #333;
             cursor: pointer;
-            z-index: 101;
         }
         #jitsiOverlay, #commentsOverlay {
             display: none;
@@ -85,7 +81,7 @@
             width: 20%;
             cursor: pointer;
         }
-        #syncPopup {
+        #syncPopup, #schedulePopup {
             display: none;
             position: fixed;
             top: 50%;
@@ -97,13 +93,22 @@
             padding: 20px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
         }
-        #syncPopup input {
+        #syncPopup input, #schedulePopup input {
             margin: 10px 0;
             padding: 10px;
             width: 100%;
         }
         #timeSlider {
             width: 100%;
+        }
+        @media (max-width: 768px) {
+            video {
+                height: 100%;
+            }
+            #jitsiOverlay, #commentsOverlay {
+                width: 100%;
+                height: 50%;
+            }
         }
     </style>
 </head>
@@ -119,11 +124,12 @@
         Your browser does not support the video tag.
     </video>
 
-    <!-- Control Icons to Toggle Jitsi, Comments, and Sync -->
+    <!-- Control Icons to Toggle Jitsi, Comments, Sync, and Schedule -->
     <div id="controls">
         <button onclick="toggleJitsi()">💬</button> <!-- Toggle Jitsi -->
         <button onclick="toggleComments()">📝</button> <!-- Toggle Comments -->
         <button onclick="openSyncPopup()">🔄</button> <!-- Sync Popup -->
+        <button onclick="openSchedulePopup()">📅</button> <!-- Schedule Popup -->
     </div>
 
     <!-- Jitsi Meet Overlay -->
@@ -156,9 +162,37 @@
         <input type="range" id="timeSlider" min="0" max="100" step="1" value="0" oninput="seekToPosition()">
         <button onclick="closeSyncPopup()">Close</button>
     </div>
+
+    <!-- Schedule Popup -->
+    <div id="schedulePopup">
+        <h3>Schedule Viewing</h3>
+        <label for="movieSelect">Select Movie:</label>
+        <select id="movieSelect">
+            <option value="Big Buck Bunny">Big Buck Bunny</option>
+            <option value="Sintel">Sintel</option>
+            <option value="Tears of Steel">Tears of Steel</option>
+        </select>
+        <br>
+        <label for="datePicker">Select Date:</label>
+        <input type="date" id="datePicker">
+        <label for="timePicker">Select Time:</label>
+        <input type="time" id="timePicker">
+        <button onclick="scheduleViewing()">Schedule</button>
+        <button onclick="closeSchedulePopup()">Close</button>
+    </div>
 </div>
 
 <script>
+    // Register Service Worker for Local Caching
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/service-worker.js')
+            .then(registration => {
+                console.log('ServiceWorker registered with scope:', registration.scope);
+            }).catch(error => {
+                console.log('ServiceWorker registration failed:', error);
+            });
+    }
+
     // Toggle Jitsi Overlay
     function toggleJitsi() {
         const jitsiOverlay = document.getElementById('jitsiOverlay');
@@ -180,6 +214,24 @@
         document.getElementById('syncPopup').style.display = 'none';
     }
 
+    // Schedule Popup
+    function openSchedulePopup() {
+        document.getElementById('schedulePopup').style.display = 'block';
+    }
+
+    function closeSchedulePopup() {
+        document.getElementById('schedulePopup').style.display = 'none';
+    }
+
+    // Schedule Viewing (movie selection and date/time)
+    function scheduleViewing() {
+        const movie = document.getElementById('movieSelect').value;
+        const date = document.getElementById('datePicker').value;
+        const time = document.getElementById('timePicker').value;
+        alert(`Viewing scheduled for: ${movie} on ${date} at ${time}`);
+        closeSchedulePopup();
+    }
+
     // Add Comment with Emoji
     function addComment() {
         const comment = document.getElementById('commentInput').value;
@@ -190,43 +242,4 @@
         newComment.textContent = `${timestamp} - ${comment} ${emoji}`;
         commentsDiv.appendChild(newComment);
         commentsDiv.scrollTop = commentsDiv.scrollHeight;
-        document.getElementById('commentInput').value = '';
-        document.getElementById('emojiPicker').value = '';
-    }
-
-    // Add Emoji to Comment Input
-    function addEmoji() {
-        const emoji = document.getElementById('emojiPicker').value;
-        const commentInput = document.getElementById('commentInput');
-        commentInput.value += emoji;
-    }
-
-    // Fullscreen video when orientation changes
-    window.addEventListener("orientationchange", function() {
-        const video = document.getElementById('moviePlayer');
-        if (window.innerHeight > window.innerWidth) {
-            video.style.width = "100%";
-            video.style.height = "auto";
-        } else {
-            video.style.height = "100%";
-            video.style.width = "auto";
-        }
-    });
-
-    // Sync the video position with the slider
-    const moviePlayer = document.getElementById('moviePlayer');
-    const timeSlider = document.getElementById('timeSlider');
-
-    moviePlayer.addEventListener('timeupdate', () => {
-        const currentTime = (moviePlayer.currentTime / moviePlayer.duration) * 100;
-        timeSlider.value = currentTime;
-    });
-
-    function seekToPosition() {
-        const time = moviePlayer.duration * (timeSlider.value / 100);
-        moviePlayer.currentTime = time;
-    }
-</script>
-
-</body>
-</html>
+        document.getElementById('commentInput
