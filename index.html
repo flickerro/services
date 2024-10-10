@@ -23,11 +23,21 @@
             height: auto;
             max-height: 100vh;
         }
+        #hamburger {
+            position: absolute;
+            top: 10px;
+            right: 10px; /* Moved to the top right */
+            font-size: 30px;
+            cursor: pointer;
+            z-index: 101;
+        }
         #controls {
             position: absolute;
             top: 10px;
-            right: 10px;
+            right: 10px; /* Adjusted position for consistency with hamburger */
+            display: none;
             z-index: 100;
+            flex-direction: column;
         }
         #controls button {
             font-size: 20px;
@@ -74,11 +84,16 @@
             padding: 10px;
         }
         #commentInput {
-            width: 70%;
+            width: 60%; /* Adjusted width to make room for the send button */
             padding: 5px;
         }
         #emojiPicker {
-            width: 20%;
+            width: 10%; /* Reduced width to fit with the send button */
+            cursor: pointer;
+        }
+        #sendButton {
+            width: 20%; /* Added send button */
+            padding: 5px;
             cursor: pointer;
         }
         #syncPopup, #schedulePopup {
@@ -109,12 +124,18 @@
                 width: 100%;
                 height: 50%;
             }
+            #controls {
+                right: 5px; /* Adjusted for smaller screens */
+            }
         }
     </style>
 </head>
 <body>
 
 <div id="mainContainer">
+    <!-- Hamburger Icon -->
+    <div id="hamburger" onclick="toggleControls()">☰</div>
+
     <!-- Flickerro Logo -->
     <div id="logo" onclick="window.location.href='https://flickerro.github.io'">Flickerro</div>
 
@@ -153,7 +174,7 @@
             <option value="❤️">❤️</option>
             <option value="🔥">🔥</option>
         </select>
-        <button onclick="addComment()">Send</button>
+        <button id="sendButton" onclick="addComment()">Send</button> <!-- Adjusted to be fully visible -->
     </div>
 
     <!-- Sync Popup -->
@@ -183,6 +204,12 @@
 </div>
 
 <script>
+    // Toggle Hamburger Menu
+    function toggleControls() {
+        const controls = document.getElementById('controls');
+        controls.style.display = controls.style.display === 'flex' ? 'none' : 'flex';
+    }
+
     // Toggle Jitsi Overlay
     function toggleJitsi() {
         const jitsiOverlay = document.getElementById('jitsiOverlay');
@@ -197,63 +224,41 @@
 
     // Sync Popup
     function openSyncPopup() {
-        document.getElementById('syncPopup').style.display = 'block';
+        const syncPopup = document.getElementById('syncPopup');
+        syncPopup.style.display = 'block';
     }
 
     function closeSyncPopup() {
-        document.getElementById('syncPopup').style.display = 'none';
+        const syncPopup = document.getElementById('syncPopup');
+        syncPopup.style.display = 'none';
     }
 
     // Schedule Popup
     function openSchedulePopup() {
-        document.getElementById('schedulePopup').style.display = 'block';
+        const schedulePopup = document.getElementById('schedulePopup');
+        schedulePopup.style.display = 'block';
     }
 
     function closeSchedulePopup() {
-        document.getElementById('schedulePopup').style.display = 'none';
-    }
-
-    // Schedule Viewing (movie selection and date/time)
-    function scheduleViewing() {
-        const movie = document.getElementById('movieSelect').value;
-        const date = document.getElementById('datePicker').value;
-        const time = document.getElementById('timePicker').value;
-        alert(`Viewing scheduled for: ${movie} on ${date} at ${time}`);
-        closeSchedulePopup();
+        const schedulePopup = document.getElementById('schedulePopup');
+        schedulePopup.style.display = 'none';
     }
 
     // Add Comment with Emoji
+    function addEmoji() {
+        const emojiPicker = document.getElementById('emojiPicker');
+        const commentInput = document.getElementById('commentInput');
+        commentInput.value += emojiPicker.value;
+    }
+
     function addComment() {
         const comment = document.getElementById('commentInput').value;
-        const emoji = document.getElementById('emojiPicker').value;
         const commentsDiv = document.getElementById('comments');
-        const newComment = document.createElement('div');
-        const timestamp = new Date().toLocaleTimeString();
-        newComment.textContent = `${timestamp} - ${comment} ${emoji}`;
-        commentsDiv.appendChild(newComment);
-        commentsDiv.scrollTop = commentsDiv.scrollHeight;
+        const commentElement = document.createElement('p');
+        commentElement.textContent = comment;
+        commentsDiv.appendChild(commentElement);
         document.getElementById('commentInput').value = '';
-        document.getElementById('emojiPicker').value = '';
     }
-
-    // Add Emoji to Comment Input
-    function addEmoji() {
-        const emoji = document.getElementById('emojiPicker').value;
-        const commentInput = document.getElementById('commentInput');
-        commentInput.value += emoji;
-    }
-
-    // Fullscreen video when orientation changes
-    window.addEventListener("orientationchange", function() {
-        const video = document.getElementById('moviePlayer');
-        if (window.innerHeight > window.innerWidth) {
-            video.style.width = "100%";
-            video.style.height = "auto";
-        } else {
-            video.style.height = "100%";
-            video.style.width = "auto";
-        }
-    });
 
     // Seek to position based on slider
     function seekToPosition() {
@@ -262,7 +267,16 @@
         const time = video.duration * (slider.value / 100);
         video.currentTime = time;
     }
+
+    // Schedule Viewing (dummy implementation)
+    function scheduleViewing() {
+        const movie = document.getElementById('movieSelect').value;
+        const date = document.getElementById('datePicker').value;
+        const time = document.getElementById('timePicker').value;
+        alert(`Scheduled ${movie} for ${date} at ${time}`);
+    }
 </script>
 
 </body>
 </html>
+
