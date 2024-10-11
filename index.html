@@ -23,18 +23,18 @@
             height: auto;
             max-height: 100vh;
         }
-        #hamburger {
+        #menuIcon {
             position: absolute;
             top: 10px;
-            right: 10px; /* Moved to the top right */
+            right: 10px; /* Positioned at the top-right corner */
             font-size: 30px;
             cursor: pointer;
             z-index: 101;
         }
         #controls {
             position: absolute;
-            top: 10px;
-            right: 10px; /* Adjusted position for consistency with hamburger */
+            top: 50px; /* Below the menu icon */
+            right: 10px;
             display: none;
             z-index: 100;
             flex-direction: column;
@@ -84,15 +84,15 @@
             padding: 10px;
         }
         #commentInput {
-            width: 60%; /* Adjusted width to make room for the send button */
+            width: 60%;
             padding: 5px;
         }
         #emojiPicker {
-            width: 10%; /* Reduced width to fit with the send button */
+            width: 10%;
             cursor: pointer;
         }
         #sendButton {
-            width: 20%; /* Added send button */
+            width: 20%;
             padding: 5px;
             cursor: pointer;
         }
@@ -116,6 +116,15 @@
         #timeSlider {
             width: 100%;
         }
+        #schedulePopup select, #schedulePopup input[type="date"], #schedulePopup input[type="time"] {
+            width: calc(100% - 20px); /* Fixed edge bleeding */
+            margin: 5px 0;
+        }
+        #movieUrlInput {
+            display: none; /* Hidden until YouTube or Other option is selected */
+            width: 100%;
+            margin: 10px 0;
+        }
         @media (max-width: 768px) {
             video {
                 height: 100%;
@@ -125,7 +134,7 @@
                 height: 50%;
             }
             #controls {
-                right: 5px; /* Adjusted for smaller screens */
+                right: 5px;
             }
         }
     </style>
@@ -133,8 +142,8 @@
 <body>
 
 <div id="mainContainer">
-    <!-- Hamburger Icon -->
-    <div id="hamburger" onclick="toggleControls()">☰</div>
+    <!-- Menu Icon -->
+    <div id="menuIcon" onclick="toggleControls()">⚙️</div>
 
     <!-- Flickerro Logo -->
     <div id="logo" onclick="window.location.href='https://flickerro.github.io'">Flickerro</div>
@@ -145,12 +154,12 @@
         Your browser does not support the video tag.
     </video>
 
-    <!-- Control Icons to Toggle Jitsi, Comments, Sync, and Schedule -->
+    <!-- Control Icons -->
     <div id="controls">
         <button onclick="toggleJitsi()">💬</button> <!-- Toggle Jitsi -->
         <button onclick="toggleComments()">📝</button> <!-- Toggle Comments -->
-        <button onclick="openSyncPopup()">🔄</button> <!-- Sync Popup -->
-        <button onclick="openSchedulePopup()">📅</button> <!-- Schedule Popup -->
+        <button onclick="toggleSyncPopup()">🔄</button> <!-- Sync Popup -->
+        <button onclick="toggleSchedulePopup()">📅</button> <!-- Schedule Popup -->
     </div>
 
     <!-- Jitsi Meet Overlay -->
@@ -174,7 +183,7 @@
             <option value="❤️">❤️</option>
             <option value="🔥">🔥</option>
         </select>
-        <button id="sendButton" onclick="addComment()">Send</button> <!-- Adjusted to be fully visible -->
+        <button id="sendButton" onclick="addComment()">Send</button>
     </div>
 
     <!-- Sync Popup -->
@@ -188,11 +197,14 @@
     <div id="schedulePopup">
         <h3>Schedule Viewing</h3>
         <label for="movieSelect">Select Movie:</label>
-        <select id="movieSelect">
+        <select id="movieSelect" onchange="showUrlInput()">
             <option value="Big Buck Bunny">Big Buck Bunny</option>
             <option value="Sintel">Sintel</option>
             <option value="Tears of Steel">Tears of Steel</option>
+            <option value="YouTube">YouTube</option>
+            <option value="Other">Other</option>
         </select>
+        <input type="text" id="movieUrlInput" placeholder="Enter URL" />
         <br>
         <label for="datePicker">Select Date:</label>
         <input type="date" id="datePicker">
@@ -204,7 +216,7 @@
 </div>
 
 <script>
-    // Toggle Hamburger Menu
+    // Toggle Control Buttons
     function toggleControls() {
         const controls = document.getElementById('controls');
         controls.style.display = controls.style.display === 'flex' ? 'none' : 'flex';
@@ -223,34 +235,43 @@
     }
 
     // Sync Popup
-    function openSyncPopup() {
+    function toggleSyncPopup() {
         const syncPopup = document.getElementById('syncPopup');
-        syncPopup.style.display = 'block';
+        syncPopup.style.display = syncPopup.style.display === 'block' ? 'none' : 'block';
     }
 
     function closeSyncPopup() {
-        const syncPopup = document.getElementById('syncPopup');
-        syncPopup.style.display = 'none';
+        document.getElementById('syncPopup').style.display = 'none';
     }
 
     // Schedule Popup
-    function openSchedulePopup() {
+    function toggleSchedulePopup() {
         const schedulePopup = document.getElementById('schedulePopup');
-        schedulePopup.style.display = 'block';
+        schedulePopup.style.display = schedulePopup.style.display === 'block' ? 'none' : 'block';
     }
 
     function closeSchedulePopup() {
-        const schedulePopup = document.getElementById('schedulePopup');
-        schedulePopup.style.display = 'none';
+        document.getElementById('schedulePopup').style.display = 'none';
     }
 
-    // Add Comment with Emoji
+    // Show/Hide Movie URL Input based on selection
+    function showUrlInput() {
+        const movieSelect = document.getElementById('movieSelect');
+        const movieUrlInput = document.getElementById('movieUrlInput');
+        if (movieSelect.value === 'YouTube' || movieSelect.value === 'Other') {
+            movieUrlInput.style.display = 'block';
+        } else {
+            movieUrlInput.style.display = 'none';
+        }
+    }
+
+    // Add Emoji to Comment
     function addEmoji() {
-        const emojiPicker = document.getElementById('emojiPicker');
-        const commentInput = document.getElementById('commentInput');
-        commentInput.value += emojiPicker.value;
+        const emoji = document.getElementById('emojiPicker').value;
+        document.getElementById('commentInput').value += emoji;
     }
 
+    // Add Comment to Comments Section
     function addComment() {
         const comment = document.getElementById('commentInput').value;
         const commentsDiv = document.getElementById('comments');
@@ -268,15 +289,15 @@
         video.currentTime = time;
     }
 
-    // Schedule Viewing (dummy implementation)
+    // Schedule Viewing
     function scheduleViewing() {
         const movie = document.getElementById('movieSelect').value;
+        const movieUrl = document.getElementById('movieUrlInput').value || "No URL";
         const date = document.getElementById('datePicker').value;
         const time = document.getElementById('timePicker').value;
-        alert(`Scheduled ${movie} for ${date} at ${time}`);
+        alert(`Scheduled ${movie} (${movieUrl}) for ${date} at ${time}`);
     }
 </script>
 
 </body>
 </html>
-
