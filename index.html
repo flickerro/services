@@ -3,301 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Remote Movie Collaboration</title>
+    <title>Flickerro - Universal Streaming and Telepresence Platform</title>
     <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            font-family: Arial, sans-serif;
-        }
-        #mainContainer {
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            height: 100%;
-        }
-        video {
-            width: 100%;
-            height: auto;
-            max-height: 100vh;
-        }
-        #menuIcon {
-            position: absolute;
-            top: 10px;
-            right: 10px; /* Positioned at the top-right corner */
-            font-size: 30px;
-            cursor: pointer;
-            z-index: 101;
-        }
+        body { margin: 0; }
+        canvas { display: block; }
         #controls {
-            position: absolute;
-            top: 50px; /* Below the menu icon */
-            right: 10px;
-            display: none;
-            z-index: 100;
-            flex-direction: column;
-        }
-        #controls button {
-            font-size: 20px;
-            margin: 5px;
-            padding: 10px;
-            background-color: rgba(0, 0, 0, 0.6);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-        }
-        #logo {
             position: absolute;
             top: 10px;
             left: 10px;
-            font-size: 24px;
-            font-weight: bold;
-            color: #333;
-            cursor: pointer;
-        }
-        #jitsiOverlay, #commentsOverlay {
-            display: none;
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 30%;
-            height: 50%;
-            z-index: 10;
-            background: white;
-            border: 1px solid #ccc;
-            overflow: hidden;
-        }
-        #commentsOverlay {
-            bottom: 0;
-            right: 0;
-            width: 30%;
-            height: 30%;
-            background-color: rgba(255, 255, 255, 0.9);
-        }
-        #commentsOverlay #comments {
-            height: 80%;
-            overflow-y: auto;
-            border: none;
-            padding: 10px;
-        }
-        #commentInput {
-            width: 60%;
-            padding: 5px;
-        }
-        #emojiPicker {
-            width: 10%;
-            cursor: pointer;
-        }
-        #sendButton {
-            width: 20%;
-            padding: 5px;
-            cursor: pointer;
-        }
-        #syncPopup, #schedulePopup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
             z-index: 100;
-            background-color: white;
-            border: 1px solid #ccc;
-            padding: 20px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
-        }
-        #syncPopup input, #schedulePopup input {
-            margin: 10px 0;
+            background-color: rgba(255, 255, 255, 0.8);
             padding: 10px;
-            width: 100%;
-        }
-        #timeSlider {
-            width: 100%;
-        }
-        #schedulePopup select, #schedulePopup input[type="date"], #schedulePopup input[type="time"] {
-            width: calc(100% - 20px); /* Fixed edge bleeding */
-            margin: 5px 0;
-        }
-        #movieUrlInput {
-            display: none; /* Hidden until YouTube or Other option is selected */
-            width: 100%;
-            margin: 10px 0;
-        }
-        @media (max-width: 768px) {
-            video {
-                height: 100%;
-            }
-            #jitsiOverlay, #commentsOverlay {
-                width: 100%;
-                height: 50%;
-            }
-            #controls {
-                right: 5px;
-            }
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
-
-<div id="mainContainer">
-    <!-- Menu Icon -->
-    <div id="menuIcon" onclick="toggleControls()">⚙️</div>
-
-    <!-- Flickerro Logo -->
-    <div id="logo" onclick="window.location.href='https://flickerro.github.io'">Flickerro</div>
-
-    <!-- Video Player -->
-    <video id="moviePlayer" controls>
-        <source id="videoSource" src="https://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
-
-    <!-- Control Icons -->
     <div id="controls">
-        <button onclick="toggleJitsi()">💬</button> <!-- Toggle Jitsi -->
-        <button onclick="toggleComments()">📝</button> <!-- Toggle Comments -->
-        <button onclick="toggleSyncPopup()">🔄</button> <!-- Sync Popup -->
-        <button onclick="toggleSchedulePopup()">📅</button> <!-- Schedule Popup -->
-    </div>
-
-    <!-- Jitsi Meet Overlay -->
-    <div id="jitsiOverlay">
-        <iframe allow="camera *;microphone *;fullscreen *;autoplay *"
-                src="https://meet.jit.si/Flickerroa975c295ddeab5b1a5323df92f61c4cc9fc88207"
-                width="100%" height="100%" frameborder="0" marginheight="0" marginwidth="0">
-            Loading…
-        </iframe>
-    </div>
-
-    <!-- Comments Overlay -->
-    <div id="commentsOverlay">
-        <div id="comments"></div>
-        <input type="text" id="commentInput" placeholder="Add your comment">
-        <select id="emojiPicker" onchange="addEmoji()">
-            <option value="">😊</option>
-            <option value="😊">😊</option>
-            <option value="😂">😂</option>
-            <option value="👍">👍</option>
-            <option value="❤️">❤️</option>
-            <option value="🔥">🔥</option>
-        </select>
-        <button id="sendButton" onclick="addComment()">Send</button>
-    </div>
-
-    <!-- Sync Popup -->
-    <div id="syncPopup">
-        <h3>Sync Video</h3>
-        <input type="range" id="timeSlider" min="0" max="100" step="1" value="0" oninput="seekToPosition()">
-        <button onclick="closeSyncPopup()">Close</button>
-    </div>
-
-    <!-- Schedule Popup -->
-    <div id="schedulePopup">
-        <h3>Schedule Viewing</h3>
-        <label for="movieSelect">Select Movie:</label>
-        <select id="movieSelect" onchange="showUrlInput()">
-            <option value="Big Buck Bunny">Big Buck Bunny</option>
-            <option value="Sintel">Sintel</option>
-            <option value="Tears of Steel">Tears of Steel</option>
-            <option value="YouTube">YouTube</option>
-            <option value="Other">Other</option>
-        </select>
-        <input type="text" id="movieUrlInput" placeholder="Enter URL" />
+        <label>Time (4th Dimension):</label>
+        <input type="range" id="timeSlider" min="0" max="100" value="0">
+        <span id="timeValue">0</span>
         <br>
-        <label for="datePicker">Select Date:</label>
-        <input type="date" id="datePicker">
-        <label for="timePicker">Select Time:</label>
-        <input type="time" id="timePicker">
-        <button onclick="scheduleViewing()">Schedule</button>
-        <button onclick="closeSchedulePopup()">Close</button>
+        <label>Translation (X Axis):</label>
+        <input type="range" id="translateXSlider" min="-5" max="5" step="0.1" value="0">
+        <span id="translateXValue">0</span>
+        <br>
+        <label>Rotation (Z Axis):</label>
+        <input type="range" id="rotateZSlider" min="0" max="360" step="1" value="0">
+        <span id="rotateZValue">0°</span>
+        <br>
+        <label>Scale (X Axis):</label>
+        <input type="range" id="scaleXSlider" min="0.1" max="5" step="0.1" value="1">
+        <span id="scaleXValue">1</span>
+        <br>
     </div>
-</div>
-
-<script>
-    // Toggle Control Buttons
-    function toggleControls() {
-        const controls = document.getElementById('controls');
-        controls.style.display = controls.style.display === 'flex' ? 'none' : 'flex';
-    }
-
-    // Toggle Jitsi Overlay
-    function toggleJitsi() {
-        const jitsiOverlay = document.getElementById('jitsiOverlay');
-        jitsiOverlay.style.display = jitsiOverlay.style.display === 'block' ? 'none' : 'block';
-    }
-
-    // Toggle Comments Overlay
-    function toggleComments() {
-        const commentsOverlay = document.getElementById('commentsOverlay');
-        commentsOverlay.style.display = commentsOverlay.style.display === 'block' ? 'none' : 'block';
-    }
-
-    // Sync Popup
-    function toggleSyncPopup() {
-        const syncPopup = document.getElementById('syncPopup');
-        syncPopup.style.display = syncPopup.style.display === 'block' ? 'none' : 'block';
-    }
-
-    function closeSyncPopup() {
-        document.getElementById('syncPopup').style.display = 'none';
-    }
-
-    // Schedule Popup
-    function toggleSchedulePopup() {
-        const schedulePopup = document.getElementById('schedulePopup');
-        schedulePopup.style.display = schedulePopup.style.display === 'block' ? 'none' : 'block';
-    }
-
-    function closeSchedulePopup() {
-        document.getElementById('schedulePopup').style.display = 'none';
-    }
-
-    // Show/Hide Movie URL Input based on selection
-    function showUrlInput() {
-        const movieSelect = document.getElementById('movieSelect');
-        const movieUrlInput = document.getElementById('movieUrlInput');
-        if (movieSelect.value === 'YouTube' || movieSelect.value === 'Other') {
-            movieUrlInput.style.display = 'block';
-        } else {
-            movieUrlInput.style.display = 'none';
-        }
-    }
-
-    // Add Emoji to Comment
-    function addEmoji() {
-        const emoji = document.getElementById('emojiPicker').value;
-        document.getElementById('commentInput').value += emoji;
-    }
-
-    // Add Comment to Comments Section
-    function addComment() {
-        const comment = document.getElementById('commentInput').value;
-        const commentsDiv = document.getElementById('comments');
-        const commentElement = document.createElement('p');
-        commentElement.textContent = comment;
-        commentsDiv.appendChild(commentElement);
-        document.getElementById('commentInput').value = '';
-    }
-
-    // Seek to position based on slider
-    function seekToPosition() {
-        const video = document.getElementById('moviePlayer');
-        const slider = document.getElementById('timeSlider');
-        const time = video.duration * (slider.value / 100);
-        video.currentTime = time;
-    }
-
-    // Schedule Viewing
-    function scheduleViewing() {
-        const movie = document.getElementById('movieSelect').value;
-        const movieUrl = document.getElementById('movieUrlInput').value || "No URL";
-        const date = document.getElementById('datePicker').value;
-        const time = document.getElementById('timePicker').value;
-        alert(`Scheduled ${movie} (${movieUrl}) for ${date} at ${time}`);
-    }
-</script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script src="https://unpkg.com/three@0.134.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://unpkg.com/three@0.134.0/examples/js/vr/WebXRManager.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
